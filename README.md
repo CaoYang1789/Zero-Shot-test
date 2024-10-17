@@ -1,5 +1,5 @@
 # Zero-Shot-test
-
+The repo is a simple test of Zero-Shot-NAS based on the approach from https://github.com/SLDGroup/survey-zero-shot-nas. The symbols '%' and '!' in some parts of the code were added to run directly in Colab, and can be removed when using other bash environments.
 ## 1. Create a working directory
 
 To ensure that files and data can be correctly stored and accessed, I created a `/home/test0` directory and switched to this directory. All subsequent file operations will be conducted in this directory.
