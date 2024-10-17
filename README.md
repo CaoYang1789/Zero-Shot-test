@@ -1,6 +1,6 @@
 # Zero-Shot-test
 
-### Create a working directory
+###1. Create a working directory
 
 To ensure that files and data can be correctly stored and accessed, I created a `/home/test0` directory and switched to this directory. All subsequent file operations will be conducted in this directory.
 
@@ -10,7 +10,7 @@ To ensure that files and data can be correctly stored and accessed, I created a 
 !pwd
 ```
 
-### Clone the nasbench repository and install it
+###2. Clone the nasbench repository and install it
 
 This step clones the NAS-Bench repository and installs the necessary dependencies. Since NAS-Bench uses an older version of TensorFlow, I replaced the original TensorFlow in the code with `tensorflow.compat.v1` to ensure compatibility in the current environment. Afterward, I installed the repository using `pip install -e .`.
 
@@ -23,7 +23,7 @@ This step clones the NAS-Bench repository and installs the necessary dependencie
 !pip install -e .
 ```
 
-### Download NAS-Bench datasets
+###3. Download NAS-Bench datasets
 
 This step downloads the NAS-Bench datasets, specifically NASBench-101 and NASBench-201. Some dataset download links have expired, such as ImageNet16-120. Therefore, I used CIFAR-10 and CIFAR-100 datasets and downloaded the NAS-Bench-201 dataset from a Google Drive link using `gdown`.
 
@@ -37,7 +37,7 @@ This step downloads the NAS-Bench datasets, specifically NASBench-101 and NASBen
 !gdown https://drive.google.com/uc?id=1scOMTUwcQhAMa_IMedp9lTzwmgqHLGgA
 ```
 
-### Clone the zero-shot NAS project
+###4. Clone the zero-shot NAS project
 
 To evaluate the architectures, I cloned the survey-zero-shot-nas project. This project implements several zero-shot proxies for architecture evaluation. I will later adjust the code and use it for architecture evaluation.
 
@@ -47,7 +47,7 @@ To evaluate the architectures, I cloned the survey-zero-shot-nas project. This p
 %cd /home/test0/survey-zero-shot-nas
 ```
 
-### Install the required dependencies
+###5. Install the required dependencies
 
 To ensure that the NAS-Bench API works properly in the project, I installed the necessary libraries, including nats_bench, NAS-Bench-201, and AutoDL-Projects dependencies. I also installed `ptflops` to calculate the model's floating point operations (FLOPs) and parameter counts.
 
@@ -62,7 +62,7 @@ To ensure that the NAS-Bench API works properly in the project, I installed the 
 !pip3 install ptflops
 ```
 
-### Run the main program
+###6. Run the main program
 
 Once everything was ready, I ran `main.py` to evaluate the architectures in the NAS-Bench-101 search space. I used the CIFAR-10 dataset and selected "basic" as the zero-shot proxy to evaluate the architectures. The evaluation results were saved in a CSV file.
 
@@ -71,10 +71,14 @@ Once everything was ready, I ran `main.py` to evaluate the architectures in the 
 !python3 main.py --searchspace=101 --dataset=cifar10 --data_path ~/dataset/ --metric=basic
 ```
 
-### Issues discovered during the run
+###7. Issues discovered during the run
 
-During the run, we encountered several issues. First, there was a circular import problem, specifically between `__init__.py` and other modules. To fix this, I removed the direct imports of `grad_norm`, `snip`, and `grasp` from the top of the `__init__.py` file and replaced them with a `lazy_import` function to load these modules only when necessary. This resolved all circular import issues. The updated file, `__init__-m.py`, has been uploaded.
+7.1.During the run, we encountered several issues. First, there was a circular import problem, specifically between `__init__.py` and other modules. To fix this, I removed the direct imports of `grad_norm`, `snip`, and `grasp` from the top of the `__init__.py` file and replaced them with a `lazy_import` function to load these modules only when necessary. This resolved all circular import issues. The updated file, `__init__-m.py`, has been uploaded.
 
-Another issue was with `main.py`, which had some formatting errors. The fixed version, `main-m.py`, has been uploaded as well. To save time, I also added a feature in `main-1000.py` that only processes the first 1000 network architectures and calculates the total runtime.
+![image](https://github.com/user-attachments/assets/079db37a-5fdc-4240-b78d-907a4aa30d81)
+![image](https://github.com/user-attachments/assets/c0e1ef68-9f84-49e4-bea0-ab1e88b25b5b)
 
-The final result on Colab's T4 GPU was that 1000 network architectures took 425.45 seconds to evaluate, which met the expected performance. The specific results will be compared with other evaluation models and updated later.
+7.2.Another issue was with `main.py`, which had some formatting errors. The fixed version, `main-m.py`, has been uploaded as well. To save time, I also added a feature in `main-1000.py` that only processes the first 1000 network architectures and calculates the total runtime.
+
+###8. Results
+The final result on Colab's T4 GPU was that 1000 network architectures took about 425 seconds to evaluate, which met the expected performance. The specific results will be compared with other evaluation models and updated later.
