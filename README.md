@@ -74,7 +74,7 @@ Once everything was ready, I ran `main.py` to evaluate the architectures in the 
 ## 7. Issues discovered during the run
 
 ### 7.1 Circular import
-During the run, we encountered several issues. First, there was a circular import problem, specifically between `__init__.py` and other modules. To fix this, I removed the direct imports of `grad_norm`, `snip`, and `grasp` from the top of the `__init__.py` file and replaced them with a `lazy_import` function to load these modules only when necessary. This resolved all circular import issues. The updated file, `__init__-m.py`, has been uploaded.
+During the run, we encountered several issues. First, there was a circular import problem, specifically between `__init__.py` in "measure" part and other modules. To fix this, I removed the direct imports of `grad_norm`, `snip`, and `grasp` from the top of the `__init__.py` file and replaced them with a `lazy_import` function to load these modules only when necessary. This resolved all circular import issues. The updated file, `__init__-m.py`, has been uploaded.
 
 ![image](https://github.com/user-attachments/assets/bd4e9ef6-1504-49cd-8e13-88a38a601365)
 
