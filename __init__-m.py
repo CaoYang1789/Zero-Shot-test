@@ -58,7 +58,6 @@ def measure(name, bn=True, copy_net=False, force_clean=True, **impl_args):
 # def calc_measure(name, net, device, *args, **kwargs):
 #     return _measure_impls[name](net, device, *args, **kwargs)
 def calc_measure(name, net, device, *args, **kwargs):
-    # 根据不同的 name 延迟导入对应模块
     if name == 'grad_norm':
         lazy_import('.grad_norm')
     elif name == 'snip':
@@ -74,7 +73,7 @@ def calc_measure(name, net, device, *args, **kwargs):
     elif name == 'synflow':
         lazy_import('.synflow')
 
-    # 调用实际的度量函数
+   
     return _measure_impls[name](net, device, *args, **kwargs)
 
 def enum_gradient_measure(net, device, *args, **kwargs):
