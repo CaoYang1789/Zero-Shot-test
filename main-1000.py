@@ -103,36 +103,35 @@ def search101(nasbench, netid, dataset, imgsize, metric, trainloader, ce_loss):
 
 
 def enumerate_networks(args):
-    # 获取一些必要的信息和数据集
     imgsize, ce_loss, trainloader, testloader = getmisc(args)
 
-    # 用于存储结果
+    
     results_dir = "results"
     os.makedirs(results_dir, exist_ok=True)  # 确保结果存储目录存在
     output_file = os.path.join(results_dir, f'{args.searchspace}_{args.dataset}_{args.metric}_results.csv')
 
-    # 计时开始
+    
     start_time = time.time()
 
-    # 打开文件准备保存结果
+    
     with open(output_file, 'w', newline='') as csvfile:
         fieldnames = ['netid', 'macs', 'params', 'train_acc', 'test_acc']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        # NAS-Bench-101 的架构评估
+       
         if '101' in args.searchspace.lower():
             assert args.dataset == "cifar10"
             NASBENCH_TFRECORD = '/home/test0/dataset/nasbench/nasbench_full.tfrecord'
             nasbench = api101.NASBench(NASBENCH_TFRECORD)
 
-            # 评估的网络数限制在1000个
+            
             allnethash = list(nasbench.hash_iterator())
             for netid in range(args.startnetid, min(1000, len(allnethash))):
                 unique_hash = allnethash[netid]
                 fixed_metrics, computed_metrics = nasbench.get_metrics_from_hash(unique_hash)
 
-                # 获取架构的准确率
+                
                 def getallacc(data_dict:dict):
                     acc4 = sum(data_dict[4][i]['final_test_accuracy'] for i in range(3)) / 3.0
                     acc12 = sum(data_dict[12][i]['final_test_accuracy'] for i in range(3)) / 3.0
@@ -144,14 +143,14 @@ def enumerate_networks(args):
                 ops = fixed_metrics['module_operations']
                 adjacency = fixed_metrics['module_adjacency']
 
-                # 构建网络
+                
                 network = NB101Network((adjacency, ops))
                 network.cuda()
 
-                # 计算架构的 flops 和参数数量
+                
                 macs, params = get_model_complexity_info(network, (3, imgsize, imgsize), as_strings=False, print_per_layer_stat=False, verbose=False)
 
-                # 保存结果到 CSV 文件
+                
                 writer.writerow({
                     'netid': netid,
                     'macs': macs,
@@ -161,19 +160,19 @@ def enumerate_networks(args):
                 })
                 print(f"Evaluated network {netid}, saved results.")
 
-        # NAS-Bench-201 的架构评估
+        
         elif '201' in args.searchspace.lower():
             api = API201('/home/test0/dataset/nasbench/NAS-Bench-201-v1_1-096897.pth', verbose=False)
 
-            # 评估的网络数限制在1000个
+            
             for netid in range(args.startnetid, 1000):
                 network, metric = search201(api, netid, args.dataset)
                 network.cuda()
 
-                # 计算架构的 flops 和参数数量
+                
                 macs, params = get_model_complexity_info(network, (3, imgsize, imgsize), as_strings=False, print_per_layer_stat=False, verbose=False)
 
-                # 保存结果到 CSV 文件
+                
                 writer.writerow({
                     'netid': netid,
                     'macs': macs,
@@ -183,7 +182,7 @@ def enumerate_networks(args):
                 })
                 print(f"Evaluated network {netid}, saved results.")
 
-        # NATS 的架构评估
+        
         elif 'nats' in args.searchspace.lower():
             if 'tss' in args.searchspace.lower():
                 api = create_nats('/home/test0/dataset/nasbench/NATS/NATS-tss-v1_0-3ffb9-simple', 'tss', fast_mode=True, verbose=True)
@@ -192,15 +191,15 @@ def enumerate_networks(args):
                 api = create_nats('/home/test0/dataset/nasbench/NATS/NATS-sss-v1_0-50262-simple', 'sss', fast_mode=True, verbose=True)
                 hpval = '90'
 
-            # 评估的网络数限制在1000个
+            
             for netid in range(args.startnetid, 1000):
                 network, metric = search_nats(api, netid, args.dataset, hpval)
                 network.cuda()
 
-                # 计算架构的 flops 和参数数量
+                
                 macs, params = get_model_complexity_info(network, (3, imgsize, imgsize), as_strings=False, print_per_layer_stat=False, verbose=False)
 
-                # 保存结果到 CSV 文件
+                
                 writer.writerow({
                     'netid': netid,
                     'macs': macs,
@@ -210,7 +209,7 @@ def enumerate_networks(args):
                 })
                 print(f"Evaluated network {netid}, saved results.")
 
-    # 计时结束并输出总时间
+    
     end_time = time.time()
     total_time = end_time - start_time
     print(f"Total time to evaluate 1000 networks: {total_time:.2f} seconds")
